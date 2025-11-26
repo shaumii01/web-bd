@@ -51,7 +51,7 @@ app.use(express.static('public'));  // untuk file statis seperti CSS
 
 // Route utama
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { userName: req.session.userName });
 });
 
 // Route login
@@ -64,9 +64,18 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+        }
+        res.redirect('/');
+    });
+});
+
 // Route halaman utama (protected)
-app.get('/halaman-utama', requireAuth, (req, res) => {
-    res.render('halaman_utama', { userName: req.session.userName });
+app.get('/index', requireAuth, (req, res) => {
+    res.render('index', { userName: req.session.userName });
 });
 
 // Middleware to check if user is authenticated
@@ -112,7 +121,7 @@ app.post('/login', [
             req.session.userId = user.id;
             req.session.userName = user.name;
 
-            res.redirect('/halaman-utama');
+            res.redirect('/index');
         });
     } catch (error) {
         console.error('Login error:', error);
@@ -256,6 +265,18 @@ app.post('/check-weight', (req, res) => {
         weightCategory
     });
 });
+
+// app.get('/result-weight', (req, res) => {
+//     const { bmi, status, berat, tinggi } = req.query;
+
+//    res.render("result-weight", {
+//     name: name,
+//     age: age,
+//     bmi: bmi,
+//     weightCategory: weightCategory
+// });
+
+// });
 
 // Route untuk input dan cek tekanan darah dan SpO2
 app.get('/check-vitals', (req, res) => {

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Riwayat</title>
+    <style>
+        /* ===== GLOBAL ===== */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #c9f1ff, #ffffff);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* ===== TITLE ===== */
+h1 {
+    text-align: center;
+    padding: 20px;
+    color: #0078d4;
+    margin-top: 15px;
+}
+
+h2 {
+    margin-top: 30px;
+    color: #0078d4;
+}
+
+/* ===== CONTAINER ===== */
+.page-container {
+    max-width: 700px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ===== LIST STYLE ===== */
+ul {
+    background: #f8f8f8;
+    padding: 15px 20px;
+    border-radius: 10px;
+    list-style: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+ul li:last-child {
+    border-bottom: none;
+}
+
+/* ===== EMPTY TEXT ===== */
+p {
+    background: #fff4f4;
+    padding: 10px 12px;
+    border-left: 4px solid #d40000;
+    border-radius: 6px;
+}
+
+/* ===== BACK BUTTON ===== */
+a.back-btn {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 20px auto;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background: #0078d4;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+a.back-btn:hover {
+    background: #005fa3;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .page-container {
+        width: 88%;
+        padding: 18px;
+    }
+}
+    </style>
+</head>
+<body>
+  <h1>Riwayat Pemeriksaan</h1>
+
+  <h2>Data Berat Badan</h2>
+  <% if (weightData && weightData.length > 0) { %>
+    <ul>
+      <% weightData.forEach(function(w){ %>
+        <li><%= w.created_at %> — BMI: <%= w.bmi %> — <%= w.weight_category %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>Tidak ada data berat badan.</p>
+  <% } %>
+
+  <h2>Data Vitals</h2>
+  <% if (vitalsData && vitalsData.length > 0) { %>
+    <ul>
+      <% vitalsData.forEach(function(v){ %>
+        <li><%= v.created_at %> — <%= v.systolic %>/<%= v.diastolic %> mmHg — SpO2: <%= v.spo2 %>%</li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>Tidak ada data vitals.</p>
+  <% } %>
+
+  <a href="/">Kembali</a>
+</body>
+</html>
