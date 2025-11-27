@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+.top-bar {
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.nav-links a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+.user-profile span {
+    margin-right: 10px;
+}
+
+.logout {
+    background: #f44336;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+}
+</style>
+</head>
+<body>
+    <div class="top-bar">
+    <div class="logo">Health Check</div>
+    <div class="nav-links">
+        <a href="/index">Home</a>
+        <a href="/check-weight">Check BMI</a>
+        <a href="/check-vitals">Check Vitals</a>
+        <a href="/history">History</a>
+    </div>
+    <div class="user-profile">
+        <span>Welcome, <%= userName %></span>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+</div>
+</body>
+</html>

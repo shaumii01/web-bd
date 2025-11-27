@@ -236,33 +236,17 @@ function getSpO2Category(spo2) {
 }
 
 // Route untuk input dan cek berat badan ideal
-app.get('/check-weight', (req, res) => {
-    res.render('check-weight');
-});
+app.get('/check-weight', requireAuth, (req, res) => res.render('check-weight'));
 
-app.post('/check-weight', (req, res) => {
+app.post('/check-weight', requireAuth, (req, res) => {
     const { name, age, height, weight } = req.body;
-    
-    // Hitung BMI dan kategori berat badan ideal berdasarkan umur
-    const heightM = height / 100;
-    const bmi = (weight / (heightM * heightM)).toFixed(2);
+    const bmi = (weight / ((height/100)**2)).toFixed(2);
     const weightCategory = getBMICategory(parseFloat(bmi), parseInt(age));
 
-    // Simpan ke database
-    const sql = 'INSERT INTO weight_data (name, age, height, weight, bmi, weight_category) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(sql, [name, age, height, weight, bmi, weightCategory], (err) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.render('check-weight', { errors: [{ msg: 'Gagal menyimpan data' }] });
-        }
-    });
-
-    // Render hasil
-    res.render('result-weight', { 
-        name, 
-        age,
-        bmi, 
-        weightCategory
+    const sql = 'INSERT INTO weight_data (user_id, name, age, height, weight, bmi, weight_category, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
+    db.query(sql, [req.session.userId, name, age, height, weight, bmi, weightCategory], (err) => {
+        if(err) return res.render('check-weight', { errors: [{ msg: 'Gagal menyimpan data' }] });
+        res.render('result-weight', { name, age, bmi, weightCategory });
     });
 });
 
@@ -279,37 +263,36 @@ app.post('/check-weight', (req, res) => {
 // });
 
 // Route untuk input dan cek tekanan darah dan SpO2
-app.get('/check-vitals', (req, res) => {
-    res.render('check-vitals');
-});
+app.get('/check-vitals', requireAuth, (req, res) => res.render('check-vitals'));
 
-app.post('/check-vitals', (req, res) => {
+app.post('/check-vitals', requireAuth, (req, res) => {
     const { name, age, systolic, diastolic, spo2 } = req.body;
-    
-    // Kategori tekanan darah
     const bloodCategory = getBloodPressureCategory(parseInt(systolic), parseInt(diastolic));
-    
-    // Kategori SpO2
     const spo2Category = getSpO2Category(parseInt(spo2));
 
-    // Simpan ke database
-    const sql = 'INSERT INTO vitals_data (name, age, systolic, diastolic, blood_category, spo2, spo2_category) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    db.query(sql, [name, age, systolic, diastolic, bloodCategory, spo2, spo2Category], (err) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.render('check-vitals', { errors: [{ msg: 'Gagal menyimpan data' }] });
-        }
+    const sql = 'INSERT INTO vitals_data (user_id, name, age, systolic, diastolic, blood_category, spo2, spo2_category, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+    db.query(sql, [req.session.userId, name, age, systolic, diastolic, bloodCategory, spo2, spo2Category], (err) => {
+        if(err) return res.render('check-vitals', { errors: [{ msg: 'Gagal menyimpan data' }] });
+        res.render('result-vitals', { name, age, systolic, diastolic, bloodCategory, spo2, spo2Category });
     });
+});
+    app.get('/history', requireAuth, (req, res) => {
+    const getWeight = 'SELECT * FROM weight_data WHERE user_id = ? ORDER BY created_at DESC';
+    const getVitals = 'SELECT * FROM vitals_data WHERE user_id = ? ORDER BY created_at DESC';
 
-    // Render hasil
-    res.render('result-vitals', { 
-        name, 
-        age,
-        systolic, 
-        diastolic, 
-        bloodCategory,
-        spo2,
-        spo2Category
+    db.query(getWeight, [req.session.userId], (err, weightResults) => {
+        if (err) return res.render('history', { weightHistory: [], vitalsHistory: [], userName: req.session.userName, errors: [{ msg: 'Gagal mengambil riwayat' }] });
+
+        db.query(getVitals, [req.session.userId], (err, vitalsResults) => {
+            if (err) return res.render('history', { weightHistory: [], vitalsHistory: [], userName: req.session.userName, errors: [{ msg: 'Gagal mengambil riwayat' }] });
+
+            res.render('history', {
+                weightHistory: weightResults,
+                vitalsHistory: vitalsResults,
+                userName: req.session.userName,
+                errors: []
+            });
+        });
     });
 });
 
